@@ -285,8 +285,6 @@ def rationalizability_2x2(strategies, payoff_matrix):
     Iterated elimination of never-best responses for a 2x2 game.
     Uses the existing:
         - compute_best_responses()
-        - get_strict_dominance()
-        - get_weak_dominance()
     """
 
     remaining = strategies.copy()
@@ -306,11 +304,11 @@ def rationalizability_2x2(strategies, payoff_matrix):
         p1_actions = set([s[0]['P1_main'] for s in remaining])
         p2_actions = set([s[1]['P2_main'] for s in remaining])
 
-        # 2. Find which actions are NEVER best responses
-        never_br_p1 = {a for a in p1_actions if a not in sum(best_res["Player 1"].values(), [])}
+        # 2. Find which actions are not in the best responses
+        never_br_p1 = {a for a in p1_actions if a not in sum(best_res["Player 1"].values(), [])}  # make sure the action is valid by checking that it's not empty too
         never_br_p2 = {a for a in p2_actions if a not in sum(best_res["Player 2"].values(), [])}
 
-        # If none removed → stable
+        # If none removed → stable (no more dominated strategies)
         if not never_br_p1 and not never_br_p2:
             print("No more deletions → rationalizable set reached.")
             break
@@ -328,6 +326,7 @@ def rationalizability_2x2(strategies, payoff_matrix):
         print("Removed P1:", never_br_p1)
         print("Removed P2:", never_br_p2)
 
+        changed = True
         remaining = new_remaining
         remaining_payoffs = new_payoffs
         iteration += 1
